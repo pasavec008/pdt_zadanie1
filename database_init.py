@@ -14,68 +14,60 @@ def create_tables(conn):
     query = '''
         CREATE TABLE IF NOT EXISTS authors(
             id BIGINT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            username VARCHAR(255) NOT NULL,
-            description TEXT NOT NULL,
-            followers_count INT NOT NULL,
-            following_count INT NOT NULL,
-            tweet_count INT NOT NULL,
-            listed_count INT NOT NULL
+            name VARCHAR(255),
+            username VARCHAR(255),
+            description TEXT,
+            followers_count INT,
+            following_count INT,
+            tweet_count INT,
+            listed_count INT
         );
 
         CREATE TABLE IF NOT EXISTS conversations(
             id BIGINT PRIMARY KEY,
-            author_id BIGINT,
-            content TEXT,
-            possibly_sensitive BOOLEAN,
-            language VARCHAR(3),
-            source TEXT,
-            retweet_count INT NOT NULL,
-            reply_count INT NOT NULL,
-            like_count INT NOT NULL,
-            quote_count INT NOT NULL,
-            created_at TIMESTAMPTZ,
+            author_id BIGINT NOT NULL,
+            content TEXT NOT NULL,
+            possibly_sensitive BOOLEAN NOT NULL,
+            language VARCHAR(3) NOT NULL,
+            source TEXT NOT NULL,
+            retweet_count INT,
+            reply_count INT,
+            like_count INT,
+            quote_count INT,
+            created_at TIMESTAMPTZ NOT NULL,
             CONSTRAINT fk_user FOREIGN KEY(author_id) REFERENCES authors(id)
         );
 
         CREATE TABLE IF NOT EXISTS hashtags(
-            id BIGINT PRIMARY KEY,
+            id BIGSERIAL PRIMARY KEY,
             tag TEXT UNIQUE NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS conversation_hashtags(
             id BIGINT PRIMARY KEY,
-            conversation_id BIGINT,
-            hashtag_id BIGINT,
-            CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id),
-            CONSTRAINT fk_hashtag FOREIGN KEY(hashtag_id) REFERENCES hashtags(id)
-        );
-
-        CREATE TABLE IF NOT EXISTS conversation_hashtags(
-            id BIGINT PRIMARY KEY,
-            conversation_id BIGINT,
-            hashtag_id BIGINT,
+            conversation_id BIGINT NOT NULL,
+            hashtag_id BIGINT NOT NULL,
             CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id),
             CONSTRAINT fk_hashtag FOREIGN KEY(hashtag_id) REFERENCES hashtags(id)
         );
 
         CREATE TABLE IF NOT EXISTS context_domains(
             id BIGINT PRIMARY KEY,
-            name VARCHAR(255),
-            description TEXT NOT NULL
+            name VARCHAR(255) NOT NULL,
+            description TEXT
         );
 
         CREATE TABLE IF NOT EXISTS context_entities(
             id BIGINT PRIMARY KEY,
-            name VARCHAR(255),
-            description TEXT NOT NULL
+            name VARCHAR(255) NOT NULL,
+            description TEXT
         );
 
         CREATE TABLE IF NOT EXISTS context_annotations(
             id BIGINT PRIMARY KEY,
-            conversation_id BIGINT,
-            context_domain_id BIGINT,
-            context_entity_id BIGINT,
+            conversation_id BIGINT NOT NULL,
+            context_domain_id BIGINT NOT NULL,
+            context_entity_id BIGINT NOT NULL,
             CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id),
             CONSTRAINT fk_context_domain FOREIGN KEY(context_domain_id) REFERENCES context_domains(id),
             CONSTRAINT fk_context_entity FOREIGN KEY(context_entity_id) REFERENCES context_entities(id)
@@ -83,27 +75,27 @@ def create_tables(conn):
 
         CREATE TABLE IF NOT EXISTS annotations(
             id BIGINT PRIMARY KEY,
-            conversation_id BIGINT,
-            value TEXT,
-            type TEXT,
-            probability NUMERIC(4, 3),
+            conversation_id BIGINT NOT NULL,
+            value TEXT NOT NULL,
+            type TEXT NOT NULL,
+            probability NUMERIC(4, 3) NOT NULL,
             CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id)
         );
 
         CREATE TABLE IF NOT EXISTS links(
             id BIGINT PRIMARY KEY,
-            conversation_id BIGINT,
-            url VARCHAR(2048),
-            title TEXT NOT NULL,
-            description TEXT NOT NULL,
+            conversation_id BIGINT NOT NULL,
+            url VARCHAR(2048) NOT NULL,
+            title TEXT,
+            description TEXT,
             CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id)
         );
 
         CREATE TABLE IF NOT EXISTS conversation_references(
             id BIGINT PRIMARY KEY,
-            conversation_id BIGINT,
-            parent_id BIGINT,
-            type VARCHAR(20),
+            conversation_id BIGINT NOT NULL,
+            parent_id BIGINT NOT NULL,
+            type VARCHAR(20) NOT NULL,
             CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id),
             CONSTRAINT fk_conversation_parent FOREIGN KEY(parent_id) REFERENCES conversations(id)
         );
