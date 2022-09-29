@@ -27,7 +27,6 @@ def send_hashtag_batch(conn, cursor, batch):
     conn.commit()
 
 def first_data_reading(conn, conversations_file, cursor):
-    b=0
     start = time.time()
     i = 0
     batch_conversations = []
@@ -51,6 +50,7 @@ def first_data_reading(conn, conversations_file, cursor):
             conversations_dict['public_metrics']['quote_count'],
             conversations_dict['created_at']
         ))
+    
 
         #Data for hashtags table
         if 'entities' in conversations_dict and 'hashtags' in conversations_dict['entities']:
@@ -76,15 +76,15 @@ def first_data_reading(conn, conversations_file, cursor):
             batch_conversations = []
             batch_hashtags = []
             i = 0
-            b+=1
+            #b+=1
             start = time.time()
         
-    if b == 10:
-        return
     #send final data
     if i:
         send_conversations_batch(conn, cursor, batch_conversations)
         send_hashtag_batch(conn, cursor, batch_hashtags)
+    
+    
 
 def migration(conn, conversations_file):
     cursor = conn.cursor()
