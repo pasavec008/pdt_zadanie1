@@ -1,7 +1,7 @@
 import json
 import time
 
-BATCH_SIZE = 10000
+BATCH_SIZE = 100000
 
 def send_conversations_batch(conn, cursor, batch):
     formated_batch = []
@@ -26,15 +26,24 @@ def send_hashtag_batch(conn, cursor, batch):
     cursor.execute("INSERT INTO hashtags(tag) VALUES " + formated_data + "ON CONFLICT (tag) DO NOTHING")
     conn.commit()
 
-def first_data_reading(conn, conversations_file, cursor):
+def first_data_reading(conn, conversations_file, cursor, authors_hash_map):
     start = time.time()
     i = 0
     batch_conversations = []
     batch_hashtags = []
+    authors_hash_map_length = len(authors_hash_map)
 
     for record in conversations_file:
         conversations_dict = json.loads(record)
         #print(conversations_dict)
+
+        can_be_inserted = False
+        x = int(conversations_dict['author_id'])
+        if x in authors_hash_map[x % authors_hash_map_length]:
+            can_be_inserted = True
+        
+        if(not can_be_inserted):
+            continue
         
         #Data for conversations table
         batch_conversations.append((
@@ -53,9 +62,9 @@ def first_data_reading(conn, conversations_file, cursor):
     
 
         #Data for hashtags table
-        if 'entities' in conversations_dict and 'hashtags' in conversations_dict['entities']:
-            for hashtag in conversations_dict['entities']['hashtags']:
-                batch_hashtags.append((hashtag['tag'],))
+        # if 'entities' in conversations_dict and 'hashtags' in conversations_dict['entities']:
+        #     for hashtag in conversations_dict['entities']['hashtags']:
+        #         batch_hashtags.append((hashtag['tag'],))
 
         #Data for context_domains table
 
@@ -64,32 +73,29 @@ def first_data_reading(conn, conversations_file, cursor):
         #print(batch[-1])
         
         i += 1
-        # if i == 10:
-        #     print(batch_hashtags[0])
-        #     return
 
         
         if(i == BATCH_SIZE):
-            print(time.time()-start)
             send_conversations_batch(conn, cursor, batch_conversations)
-            send_hashtag_batch(conn, cursor, batch_hashtags)
+            # send_hashtag_batch(conn, cursor, batch_hashtags)
             batch_conversations = []
-            batch_hashtags = []
+            # batch_hashtags = []
             i = 0
             #b+=1
+            print(time.time()-start)
             start = time.time()
         
     #send final data
     if i:
         send_conversations_batch(conn, cursor, batch_conversations)
-        send_hashtag_batch(conn, cursor, batch_hashtags)
+        # send_hashtag_batch(conn, cursor, batch_hashtags)
     
     
 
-def migration(conn, conversations_file):
+def migration(conn, conversations_file, authors_hash_map):
     cursor = conn.cursor()
 
     #First reading of data
-    first_data_reading(conn, conversations_file, cursor)
+    first_data_reading(conn, conversations_file, cursor, authors_hash_map)
 
     return

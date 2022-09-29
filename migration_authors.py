@@ -18,32 +18,43 @@ def send_batch(conn, cursor, batch):
 
 
 def migration(conn, authors_file):
+    hash_map = []
+
+    for i in range(10000000):
+        hash_map.append([])
+    
+    hash_map_length = len(hash_map)
+
     cursor = conn.cursor()
     i = 0
     batch = []
     for record in authors_file:
         authors_dict = json.loads(record)
 
-        batch.append((
-            authors_dict['id'],
-            authors_dict['name'].replace('\x00', ''),
-            authors_dict['username'].replace('\x00', ''),
-            authors_dict['description'].replace('\x00', ''),
-            authors_dict['public_metrics']['followers_count'],
-            authors_dict['public_metrics']['following_count'],
-            authors_dict['public_metrics']['tweet_count'],
-            authors_dict['public_metrics']['listed_count']
-        ))
+        # find place in hashmap for new author id
+        x = int(authors_dict['id'])
+        hash_map[x % hash_map_length].append(x)
+
+    #     batch.append((
+    #         authors_dict['id'],
+    #         authors_dict['name'].replace('\x00', ''),
+    #         authors_dict['username'].replace('\x00', ''),
+    #         authors_dict['description'].replace('\x00', ''),
+    #         authors_dict['public_metrics']['followers_count'],
+    #         authors_dict['public_metrics']['following_count'],
+    #         authors_dict['public_metrics']['tweet_count'],
+    #         authors_dict['public_metrics']['listed_count']
+    #     ))
         
-        i += 1
+    #     i += 1
 
-        if(i == BATCH_SIZE):
-            send_batch(conn, cursor, batch)
-            batch = []
-            i = 0
+    #     if(i == BATCH_SIZE):
+    #         send_batch(conn, cursor, batch)
+    #         batch = []
+    #         i = 0
 
-    #send final data
-    if i:
-        send_batch(conn, cursor, batch)
+    # #send final data
+    # if i:
+    #     send_batch(conn, cursor, batch)
 
-    return
+    return hash_map
