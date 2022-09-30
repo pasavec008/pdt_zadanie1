@@ -43,11 +43,9 @@ def create_tables(conn):
         );
 
         CREATE TABLE IF NOT EXISTS conversation_hashtags(
-            id BIGINT PRIMARY KEY,
+            id BIGSERIAL PRIMARY KEY,
             conversation_id BIGINT NOT NULL,
-            hashtag_id BIGINT NOT NULL,
-            CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id),
-            CONSTRAINT fk_hashtag FOREIGN KEY(hashtag_id) REFERENCES hashtags(id)
+            hashtag_id BIGINT NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS context_domains(
@@ -66,10 +64,7 @@ def create_tables(conn):
             id BIGSERIAL PRIMARY KEY,
             conversation_id BIGINT NOT NULL,
             context_domain_id BIGINT NOT NULL,
-            context_entity_id BIGINT NOT NULL,
-            CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id),
-            CONSTRAINT fk_context_domain FOREIGN KEY(context_domain_id) REFERENCES context_domains(id),
-            CONSTRAINT fk_context_entity FOREIGN KEY(context_entity_id) REFERENCES context_entities(id)
+            context_entity_id BIGINT NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS annotations(
