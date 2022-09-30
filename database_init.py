@@ -34,13 +34,12 @@ def create_tables(conn):
             reply_count INT,
             like_count INT,
             quote_count INT,
-            created_at TIMESTAMPTZ NOT NULL,
-            CONSTRAINT fk_user FOREIGN KEY(author_id) REFERENCES authors(id)
+            created_at TIMESTAMPTZ NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS hashtags(
-            id BIGSERIAL PRIMARY KEY,
-            tag TEXT UNIQUE NOT NULL
+            id BIGINT PRIMARY KEY,
+            tag TEXT NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS conversation_hashtags(
@@ -64,7 +63,7 @@ def create_tables(conn):
         );
 
         CREATE TABLE IF NOT EXISTS context_annotations(
-            id BIGINT PRIMARY KEY,
+            id BIGSERIAL PRIMARY KEY,
             conversation_id BIGINT NOT NULL,
             context_domain_id BIGINT NOT NULL,
             context_entity_id BIGINT NOT NULL,

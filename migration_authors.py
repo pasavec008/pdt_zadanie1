@@ -20,7 +20,7 @@ def send_batch(conn, cursor, batch):
 def migration(conn, authors_file):
     hash_map = []
 
-    for i in range(10000000):
+    for i in range(8000000):
         hash_map.append([])
     
     hash_map_length = len(hash_map)
