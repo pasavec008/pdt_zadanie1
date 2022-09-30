@@ -33,4 +33,3 @@ def send_conversations_batch(conn, cursor, batch):
     formated_data = ','.join(formated_batch)
 
     cursor.execute("INSERT INTO conversations VALUES " + formated_data + "ON CONFLICT (id) DO NOTHING")
-    conn.commit()

@@ -25,7 +25,6 @@ def send_hashtag_batch(conn, cursor, batch):
     formated_data = ','.join(formated_batch)
 
     cursor.execute("INSERT INTO hashtags VALUES " + formated_data)
-    conn.commit()
 
 def send_conversation_hashtag_batch(conn, cursor, batch):
     formated_batch = []
@@ -35,7 +34,6 @@ def send_conversation_hashtag_batch(conn, cursor, batch):
     formated_data = ','.join(formated_batch)
 
     cursor.execute("INSERT INTO conversation_hashtags(conversation_id, hashtag_id) VALUES " + formated_data)
-    conn.commit()
 
 def make_hashtag_hashmap():
     hashtag_hashmap = []

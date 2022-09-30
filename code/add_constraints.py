@@ -18,5 +18,16 @@ def add_constraints(conn):
         ADD CONSTRAINT fk_context_domain FOREIGN KEY(context_domain_id) REFERENCES context_domains(id);
         ALTER TABLE context_annotations
         ADD CONSTRAINT fk_context_entity FOREIGN KEY(context_entity_id) REFERENCES context_entities(id);
+
+        ALTER TABLE annotations
+        ADD CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id);
+
+        ALTER TABLE links
+        ADD CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id);
+
+        ALTER TABLE conversation_references
+        ADD CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id);
+        ALTER TABLE conversation_references
+        CONSTRAINT fk_conversation_parent FOREIGN KEY(parent_id) REFERENCES conversations(id);
     ''')
     conn.commit()

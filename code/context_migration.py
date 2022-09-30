@@ -44,7 +44,6 @@ def send_context_domains_batch(conn, cursor, batch):
     formated_data = ','.join(formated_batch)
 
     cursor.execute("INSERT INTO context_domains VALUES " + formated_data + "ON CONFLICT (id) DO NOTHING")
-    conn.commit()
 
 def send_context_entities_batch(conn, cursor, batch):
     formated_batch = []
@@ -54,7 +53,6 @@ def send_context_entities_batch(conn, cursor, batch):
     formated_data = ','.join(formated_batch)
 
     cursor.execute("INSERT INTO context_entities VALUES " + formated_data + "ON CONFLICT (id) DO NOTHING")
-    conn.commit()
 
 def send_context_annotations_batch(conn, cursor, batch):
     formated_batch = []
@@ -64,7 +62,6 @@ def send_context_annotations_batch(conn, cursor, batch):
     formated_data = ','.join(formated_batch)
 
     cursor.execute("INSERT INTO context_annotations(conversation_id, context_domain_id, context_entity_id) VALUES " + formated_data)
-    conn.commit()
 
 def send_context_batches(conn, cursor, batch_context_domains, batch_context_entities, batch_context_annotations):
     send_context_domains_batch(conn, cursor, batch_context_domains)

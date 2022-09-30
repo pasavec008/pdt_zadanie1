@@ -68,30 +68,26 @@ def create_tables(conn):
         );
 
         CREATE TABLE IF NOT EXISTS annotations(
-            id BIGINT PRIMARY KEY,
+            id BIGSERIAL PRIMARY KEY,
             conversation_id BIGINT NOT NULL,
             value TEXT NOT NULL,
             type TEXT NOT NULL,
-            probability NUMERIC(4, 3) NOT NULL,
-            CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id)
+            probability NUMERIC(4, 3) NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS links(
-            id BIGINT PRIMARY KEY,
+            id BIGSERIAL PRIMARY KEY,
             conversation_id BIGINT NOT NULL,
             url VARCHAR(2048) NOT NULL,
             title TEXT,
-            description TEXT,
-            CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id)
+            description TEXT
         );
 
         CREATE TABLE IF NOT EXISTS conversation_references(
-            id BIGINT PRIMARY KEY,
+            id BIGSERIAL PRIMARY KEY,
             conversation_id BIGINT NOT NULL,
             parent_id BIGINT NOT NULL,
-            type VARCHAR(20) NOT NULL,
-            CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id),
-            CONSTRAINT fk_conversation_parent FOREIGN KEY(parent_id) REFERENCES conversations(id)
+            type VARCHAR(20) NOT NULL
         );
     '''
     cursor.execute(query)
