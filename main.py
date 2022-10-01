@@ -39,6 +39,7 @@ def main():
     conversations_file.close()
     print("Third reading completed in time: ", time.time()-start)
 
+    #add constraints
     print("Adding constraints")
     add_constraints.add_constraints(conn)
     print("Constraints added in time: ", time.time()-start)

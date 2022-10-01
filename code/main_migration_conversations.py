@@ -72,7 +72,6 @@ def migration(conn, conversations_file, authors_hashmap):
             how_many_in_batch = 0
             print("Conversation batch: ", time.time()-start)
             start = time.time()
-            return conversation_hashmap
         
     #send final data
     if how_many_in_batch:

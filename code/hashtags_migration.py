@@ -18,6 +18,8 @@ def add_data_to_hashtag_batch(conversations_dict, batch_hashtags, batch_conversa
     return hashtag_max_id
     
 def send_hashtag_batch(cursor, batch):
+    if not len(batch):
+        return
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s)", x).decode("utf-8"))
@@ -27,6 +29,8 @@ def send_hashtag_batch(cursor, batch):
     cursor.execute("INSERT INTO hashtags VALUES " + formated_data)
 
 def send_conversation_hashtag_batch(cursor, batch):
+    if not len(batch):
+        return
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s)", x).decode("utf-8"))

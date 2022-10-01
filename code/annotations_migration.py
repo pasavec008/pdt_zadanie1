@@ -5,6 +5,8 @@ def add_data_to_annotations_batch(conversations_dict, batch_annotations):
     return
 
 def send_annotations_batch(cursor, batch):
+    if not len(batch):
+        return
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s, %s, %s)", x).decode("utf-8"))

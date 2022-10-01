@@ -1,6 +1,8 @@
 def add_data_to_links_batch(conversations_dict, batch_links):
     if 'entities' in conversations_dict and 'urls' in conversations_dict['entities']:
         for link in conversations_dict['entities']['urls']:
+            if len(link['expanded_url']) > 2048:
+                continue
             batch_links.append((
                 conversations_dict['id'],
                 link['expanded_url'],
@@ -10,6 +12,8 @@ def add_data_to_links_batch(conversations_dict, batch_links):
     return
 
 def send_links_batch(cursor, batch):
+    if not len(batch):
+        return
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s, %s, %s)", x).decode("utf-8"))

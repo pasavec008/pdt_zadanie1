@@ -37,6 +37,8 @@ def add_data_to_context_batches(conversations_dict, batch_context_domains, batch
             ))
 
 def send_context_domains_batch(cursor, batch):
+    if not len(batch):
+        return
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s, %s)", x).decode("utf-8"))
@@ -46,6 +48,8 @@ def send_context_domains_batch(cursor, batch):
     cursor.execute("INSERT INTO context_domains VALUES " + formated_data + "ON CONFLICT (id) DO NOTHING")
 
 def send_context_entities_batch(cursor, batch):
+    if not len(batch):
+        return
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s, %s)", x).decode("utf-8"))
@@ -55,6 +59,8 @@ def send_context_entities_batch(cursor, batch):
     cursor.execute("INSERT INTO context_entities VALUES " + formated_data + "ON CONFLICT (id) DO NOTHING")
 
 def send_context_annotations_batch(cursor, batch):
+    if not len(batch):
+        return
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s, %s)", x).decode("utf-8"))

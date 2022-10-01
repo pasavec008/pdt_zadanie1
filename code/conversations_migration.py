@@ -38,6 +38,8 @@ batch_conversations, batch_new_authors, conversation_hashmap, conversation_hashm
     return True
 
 def send_conversations_batch(cursor, batch):
+    if not len(batch):
+        return
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", x).decode("utf-8"))
@@ -47,6 +49,8 @@ def send_conversations_batch(cursor, batch):
     cursor.execute("INSERT INTO conversations VALUES " + formated_data + "ON CONFLICT (id) DO NOTHING")
 
 def send_new_authors_batch(cursor, batch):
+    if not len(batch):
+        return
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s)", x).decode("utf-8"))

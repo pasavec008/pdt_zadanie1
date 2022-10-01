@@ -27,7 +27,7 @@ def migration(conn, authors_file):
     hash_map_length = len(hash_map)
 
     cursor = conn.cursor()
-    i = 0
+    number_in_batch = 0
     batch = []
 
     start = time.time()
@@ -38,28 +38,28 @@ def migration(conn, authors_file):
         x = int(authors_dict['id'])
         hash_map[x % hash_map_length].append(x)
 
-        batch.append((
-            authors_dict['id'],
-            authors_dict['name'].replace('\x00', ''),
-            authors_dict['username'].replace('\x00', ''),
-            authors_dict['description'].replace('\x00', ''),
-            authors_dict['public_metrics']['followers_count'],
-            authors_dict['public_metrics']['following_count'],
-            authors_dict['public_metrics']['tweet_count'],
-            authors_dict['public_metrics']['listed_count']
-        ))
+        # batch.append((
+        #     authors_dict['id'],
+        #     authors_dict['name'].replace('\x00', ''),
+        #     authors_dict['username'].replace('\x00', ''),
+        #     authors_dict['description'].replace('\x00', ''),
+        #     authors_dict['public_metrics']['followers_count'],
+        #     authors_dict['public_metrics']['following_count'],
+        #     authors_dict['public_metrics']['tweet_count'],
+        #     authors_dict['public_metrics']['listed_count']
+        # ))
         
-        i += 1
+        # number_in_batch += 1
 
-        if(i == BATCH_SIZE):
-            send_batch(conn, cursor, batch)
-            batch = []
-            i = 0
-            print("Author batch: ", time.time()-start)
-            start = time.time()
+        # if(number_in_batch == BATCH_SIZE):
+        #     send_batch(conn, cursor, batch)
+        #     batch = []
+        #     number_in_batch = 0
+        #     print("Author batch: ", time.time()-start)
+        #     start = time.time()
 
     #send final data
-    if i:
+    if number_in_batch:
         send_batch(conn, cursor, batch)
 
     return hash_map
