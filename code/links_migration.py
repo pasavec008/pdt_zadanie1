@@ -3,7 +3,7 @@ def add_data_to_links_batch(conversations_dict, batch_links):
         for link in conversations_dict['entities']['urls']:
             batch_links.append((
                 conversations_dict['id'],
-                link['expanded_url'],
+                link['expanded_url'] if len(link['expanded_url']) < 2048 else link['expanded_url'][:2047],
                 '' if not 'title' in link else link['title'],
                 '' if not 'description' in link else link ['description']
             ))

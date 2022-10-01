@@ -10,7 +10,7 @@ import code.references_migration as references_migration
 
 BATCH_SIZE = 100000
 
-def migration(conn, conversations_file, authors_hash_map):
+def migration(conn, conversations_file, authors_hashmap):
     cursor = conn.cursor()
     how_many_in_batch = 0
     hashtag_max_id = 1
@@ -22,18 +22,19 @@ def migration(conn, conversations_file, authors_hash_map):
     batch_context_annotations = []
     batch_annotations = []
     batch_links = []
-    batch_references = []
 
-    authors_hash_map_length = len(authors_hash_map)
+    authors_hashmap_length = len(authors_hashmap)
     hashtag_hashmap, hashtag_hashmap_length = hashtags_migration.make_hashtag_hashmap()
+    conversation_hashmap, conversation_hashmap_length = 0,0#conversations_migration.make_conversation_hashmap()
     start = time.time()
+
 
     for record in conversations_file:
         conversations_dict = json.loads(record)
         #print(conversations_dict)
 
-        if not conversations_migration.add_data_to_conversation_batch(
-        conversations_dict, authors_hash_map, authors_hash_map_length, batch_conversations):
+        if not conversations_migration.add_data_to_conversation_batch(conversations_dict, authors_hashmap,
+        authors_hashmap_length, batch_conversations, conversation_hashmap, conversation_hashmap_length):
             continue
             
         #Data for hashtags table
@@ -48,9 +49,6 @@ def migration(conn, conversations_file, authors_hash_map):
         #Data for links
         links_migration.add_data_to_links_batch(conversations_dict, batch_links)
 
-        #Data for references
-        references_migration.add_data_to_references_batch(conversations_dict, batch_references)
-
         how_many_in_batch += 1
         
         if(how_many_in_batch == BATCH_SIZE):
@@ -60,7 +58,6 @@ def migration(conn, conversations_file, authors_hash_map):
             context_migration.send_context_batches(conn, cursor, batch_context_domains, batch_context_entities, batch_context_annotations)
             annotations_migration.send_annotations_batch(conn, cursor, batch_annotations)
             links_migration.send_links_batch(conn, cursor, batch_links)
-            references_migration.send_references_batch(conn, cursor, batch_references)
             conn.commit()
             
             batch_conversations = []
@@ -71,7 +68,6 @@ def migration(conn, conversations_file, authors_hash_map):
             batch_context_annotations = []
             batch_annotations = []
             batch_links = []
-            batch_references = []
             how_many_in_batch = 0
             print(time.time()-start)
             start = time.time()
@@ -84,6 +80,5 @@ def migration(conn, conversations_file, authors_hash_map):
         context_migration.send_context_batches(conn, cursor, batch_context_domains, batch_context_entities, batch_context_annotations)
         annotations_migration.send_annotations_batch(conn, cursor, batch_annotations)
         links_migration.send_links_batch(conn, cursor, batch_links)
-        references_migration.send_references_batch(conn, cursor, batch_references)
         conn.commit()
-    return
+    return conversation_hashmap

@@ -1,12 +1,17 @@
 def add_data_to_conversation_batch(conversations_dict, authors_hash_map, authors_hash_map_length,
-batch_conversations):
-    can_be_inserted = False
+batch_conversations, conversation_hashmap, conversation_hashmap_length):
+
     x = int(conversations_dict['author_id'])
-    if x in authors_hash_map[x % authors_hash_map_length]:
-        can_be_inserted = True
-    
-    if(not can_be_inserted):
+    if not (x in authors_hash_map[x % authors_hash_map_length]):
         return False
+
+    # y = int(conversations_dict['conversation_id'])
+    # if y in conversation_hashmap[y % conversation_hashmap_length]:
+    #     #duplicate
+    #     return False
+    # else:
+    #     conversation_hashmap[y % conversation_hashmap_length].append(y)
+
     
     #Data for conversations table
     batch_conversations.append((
@@ -33,3 +38,10 @@ def send_conversations_batch(conn, cursor, batch):
     formated_data = ','.join(formated_batch)
 
     cursor.execute("INSERT INTO conversations VALUES " + formated_data + "ON CONFLICT (id) DO NOTHING")
+
+def make_conversation_hashmap():
+    conversation_hashmap = [[]] * 40000000
+    conversation_hashmap_length = len(conversation_hashmap)
+    print("Conversation hashmap created")
+
+    return conversation_hashmap, conversation_hashmap_length
