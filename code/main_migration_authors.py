@@ -1,5 +1,8 @@
 import json
-import time
+from time import time
+from time import strftime
+from time import gmtime
+from datetime import datetime
 
 BATCH_SIZE = 100000
 
@@ -18,6 +21,7 @@ def send_batch(conn, cursor, batch):
 
 
 def migration(conn, authors_file):
+    first_reading_csv = open('results_times/first_reading.csv', 'w')
     hash_map = []
 
     for i in range(8000000):
@@ -30,7 +34,8 @@ def migration(conn, authors_file):
     number_in_batch = 0
     batch = []
 
-    start = time.time()
+    ultimate_start = time()
+    start = time()
     for record in authors_file:
         authors_dict = json.loads(record)
 
@@ -38,28 +43,38 @@ def migration(conn, authors_file):
         x = int(authors_dict['id'])
         hash_map[x % hash_map_length].append(x)
 
-        # batch.append((
-        #     authors_dict['id'],
-        #     authors_dict['name'].replace('\x00', ''),
-        #     authors_dict['username'].replace('\x00', ''),
-        #     authors_dict['description'].replace('\x00', ''),
-        #     authors_dict['public_metrics']['followers_count'],
-        #     authors_dict['public_metrics']['following_count'],
-        #     authors_dict['public_metrics']['tweet_count'],
-        #     authors_dict['public_metrics']['listed_count']
-        # ))
+        batch.append((
+            authors_dict['id'],
+            authors_dict['name'].replace('\x00', ''),
+            authors_dict['username'].replace('\x00', ''),
+            authors_dict['description'].replace('\x00', ''),
+            authors_dict['public_metrics']['followers_count'],
+            authors_dict['public_metrics']['following_count'],
+            authors_dict['public_metrics']['tweet_count'],
+            authors_dict['public_metrics']['listed_count']
+        ))
         
-        # number_in_batch += 1
+        number_in_batch += 1
 
-        # if(number_in_batch == BATCH_SIZE):
-        #     send_batch(conn, cursor, batch)
-        #     batch = []
-        #     number_in_batch = 0
-        #     print("Author batch: ", time.time()-start)
-        #     start = time.time()
+        if(number_in_batch == BATCH_SIZE):
+            send_batch(conn, cursor, batch)
+            batch = []
+            number_in_batch = 0
+            print("Author batch: ", time()-start)
+
+            time_to_write = datetime.now().strftime('%Y-%m-%dT%H:%MZ') + ';' +  \
+            strftime('%M:%S', gmtime(time() - ultimate_start)) + \
+            ';' + strftime('%M:%S', gmtime(time() - start)) + '\n'
+
+            first_reading_csv.write(time_to_write)
+
+            start = time()
+
+            
 
     #send final data
     if number_in_batch:
         send_batch(conn, cursor, batch)
 
+    first_reading_csv.close()
     return hash_map

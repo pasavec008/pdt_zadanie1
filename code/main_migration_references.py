@@ -1,5 +1,8 @@
 import json
-import time
+from time import time
+from time import strftime
+from time import gmtime
+from datetime import datetime
 
 BATCH_SIZE = 100000
 
@@ -32,12 +35,14 @@ def send_references_batch(cursor, batch):
     return
 
 def migration(conn, conversations_file, conversation_hashmap):
+    third_reading_csv = open('results_times/third_reading.csv', 'w')
     cursor = conn.cursor()
     how_many_in_batch = 0
     batch_references = []
     conversation_hashmap_length = len(conversation_hashmap)
-    start = time.time()
 
+    ultimate_start = time()
+    start = time()
     for record in conversations_file:
         conversations_dict = json.loads(record)
         
@@ -48,12 +53,18 @@ def migration(conn, conversations_file, conversation_hashmap):
             conn.commit()
             batch_references = []
             how_many_in_batch = 0
-            print("Reference batch: ", time.time()-start)
-            start = time.time()
+            print("Reference batch: ", time()-start)
+
+            time_to_write = datetime.now().strftime('%Y-%m-%dT%H:%MZ') + ';' +  \
+            strftime('%M:%S', gmtime(time() - ultimate_start)) + \
+            ';' + strftime('%M:%S', gmtime(time() - start)) + '\n'
+
+            start = time()
         
     #send final data
     if how_many_in_batch:
-        send_references_batch()
+        send_references_batch(cursor, batch_references)
         conn.commit()
     
+    third_reading_csv.close()
     return

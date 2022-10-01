@@ -1,5 +1,8 @@
 import json
-import time
+from time import time
+from time import strftime
+from time import gmtime
+from datetime import datetime
 import code.conversations_migration as conversations_migration
 import code.hashtags_migration as hashtags_migration
 import code.context_migration as context_migration
@@ -10,6 +13,7 @@ import code.links_migration as links_migration
 BATCH_SIZE = 100000
 
 def migration(conn, conversations_file, authors_hashmap):
+    second_reading_csv = open('results_times/second_reading.csv', 'w')
     cursor = conn.cursor()
     how_many_in_batch = 0
     hashtag_max_id = 1
@@ -26,8 +30,9 @@ def migration(conn, conversations_file, authors_hashmap):
     authors_hashmap_length = len(authors_hashmap)
     hashtag_hashmap, hashtag_hashmap_length = hashtags_migration.make_hashtag_hashmap()
     conversation_hashmap, conversation_hashmap_length = conversations_migration.make_conversation_hashmap()
-    start = time.time()
-
+    
+    ultimate_start = time()
+    start = time()
     for record in conversations_file:
         conversations_dict = json.loads(record)
         #print(conversations_dict)
@@ -70,8 +75,15 @@ def migration(conn, conversations_file, authors_hashmap):
             batch_annotations = []
             batch_links = []
             how_many_in_batch = 0
-            print("Conversation batch: ", time.time()-start)
-            start = time.time()
+            print("Conversation batch: ", time()-start)
+
+            time_to_write = datetime.now().strftime('%Y-%m-%dT%H:%MZ') + ';' +  \
+            strftime('%M:%S', gmtime(time() - ultimate_start)) + \
+            ';' + strftime('%M:%S', gmtime(time() - start)) + '\n'
+
+            second_reading_csv.write(time_to_write)
+
+            start = time()
         
     #send final data
     if how_many_in_batch:
@@ -83,4 +95,6 @@ def migration(conn, conversations_file, authors_hashmap):
         annotations_migration.send_annotations_batch(cursor, batch_annotations)
         links_migration.send_links_batch(cursor, batch_links)
         conn.commit()
+
+    second_reading_csv.close()
     return conversation_hashmap
