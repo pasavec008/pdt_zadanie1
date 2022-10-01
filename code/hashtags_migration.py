@@ -12,12 +12,12 @@ def add_data_to_hashtag_batch(conversations_dict, batch_hashtags, batch_conversa
                 batch_conversation_hashtags.append((conversations_dict['id'], already_there_id))
                 continue
             hashtag_hashmap[x % hashtag_hashmap_length].append([hashtag['tag'], hashtag_max_id])
-            batch_hashtags.append((hashtag_max_id, hashtag['tag'],))
+            batch_hashtags.append((hashtag_max_id, hashtag['tag']))
             batch_conversation_hashtags.append((conversations_dict['id'], hashtag_max_id))
             hashtag_max_id += 1
     return hashtag_max_id
     
-def send_hashtag_batch(conn, cursor, batch):
+def send_hashtag_batch(cursor, batch):
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s)", x).decode("utf-8"))
@@ -26,7 +26,7 @@ def send_hashtag_batch(conn, cursor, batch):
 
     cursor.execute("INSERT INTO hashtags VALUES " + formated_data)
 
-def send_conversation_hashtag_batch(conn, cursor, batch):
+def send_conversation_hashtag_batch(cursor, batch):
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s)", x).decode("utf-8"))

@@ -4,7 +4,7 @@ def add_data_to_annotations_batch(conversations_dict, batch_annotations):
             batch_annotations.append((conversations_dict['id'], annotation['normalized_text'], annotation['type'], annotation['probability']))
     return
 
-def send_annotations_batch(conn, cursor, batch):
+def send_annotations_batch(cursor, batch):
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s, %s, %s)", x).decode("utf-8"))

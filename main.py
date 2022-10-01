@@ -1,22 +1,48 @@
 import gzip
+import time
 
 #my modules
 import code.database_init as database_init
 import code.main_migration_authors as main_migration_authors
 import code.main_migration_conversations as main_migration_conversations
+import code.main_migration_references as main_migration_references
 import code.add_constraints as add_constraints
 
 def main():
+    #Database setup
+    start = time.time()
     conn = database_init.connect_to_database()
+    print("Connected to database")
     database_init.create_tables(conn)
+    print("Database and tables setup completed in time: ", print(time.time()-start))
 
+    #first reading (author file)
+    start = time.time()
+    print("First reading (author file)")
     authors_file = gzip.open('data/authors.jsonl.gz')
-    authors_hash_map = main_migration_authors.migration(conn, authors_file)
+    authors_hashmap = main_migration_authors.migration(conn, authors_file)
+    authors_file.close()
+    print("First reading completed in time: ", print(time.time()-start))
 
+    #second reading (conv file)
+    start = time.time()
+    print("Second reading (conversations file)")
     conversations_file = gzip.open('data/conversations.jsonl.gz')
-    main_migration_conversations.migration(conn, conversations_file, authors_hash_map)
+    conversations_hashmap = main_migration_conversations.migration(conn, conversations_file, authors_hashmap)
+    print("Second reading completed in time: ", print(time.time()-start))
 
-    #add_constraints.add_constraints(conn)
+    #third reading (conv file)
+    start = time.time()
+    print("Third reading (conversations file)")
+    conversations_file.seek(0)
+    main_migration_references.migration(conn, conversations_file, conversations_hashmap)
+    conversations_file.close()
+    print("Third reading completed in time: ", print(time.time()-start))
+
+    print("Adding constraints")
+    add_constraints.add_constraints(conn)
+    print("Constraints added in time: ", print(time.time()-start))
+    
     conn.close()
     return
 

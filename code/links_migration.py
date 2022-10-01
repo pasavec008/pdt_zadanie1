@@ -9,7 +9,7 @@ def add_data_to_links_batch(conversations_dict, batch_links):
             ))
     return
 
-def send_links_batch(conn, cursor, batch):
+def send_links_batch(cursor, batch):
     formated_batch = []
     for x in batch:
         formated_batch.append(cursor.mogrify("(%s, %s, %s, %s)", x).decode("utf-8"))
