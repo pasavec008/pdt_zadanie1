@@ -28,6 +28,6 @@ def add_constraints(conn):
         ALTER TABLE conversation_references
         ADD CONSTRAINT fk_conversation FOREIGN KEY(conversation_id) REFERENCES conversations(id);
         ALTER TABLE conversation_references
-        CONSTRAINT fk_conversation_parent FOREIGN KEY(parent_id) REFERENCES conversations(id);
+        ADD CONSTRAINT fk_conversation_parent FOREIGN KEY(parent_id) REFERENCES conversations(id);
     ''')
     conn.commit()

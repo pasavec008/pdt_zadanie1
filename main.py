@@ -43,6 +43,7 @@ def main():
 
     #add constraints
     print("Adding constraints")
+    start = time()
     add_constraints.add_constraints(conn)
     print("Constraints added in time: ", time()-start)
     
