@@ -1,6 +1,5 @@
 import json
 from time import time
-from time import strftime
 from time import gmtime
 from datetime import datetime
 
@@ -62,9 +61,13 @@ def migration(conn, authors_file):
             number_in_batch = 0
             print("Author batch: ", time()-start)
 
-            time_to_write = datetime.now().strftime('%Y-%m-%dT%H:%MZ') + ';' +  \
-            strftime('%M:%S', gmtime(time() - ultimate_start)) + \
-            ';' + strftime('%M:%S', gmtime(time() - start)) + '\n'
+            big_diff = gmtime(time() - ultimate_start)
+            small_diff = gmtime(time() - start)
+            time_to_write = datetime.now().strftime('%Y-%m-%dT%H:%MZ') + ';' + \
+                str((big_diff.tm_hour * 60 + big_diff.tm_min)).zfill(2) + ":" + \
+                str(big_diff.tm_sec).zfill(2) + ';' +\
+                str((small_diff.tm_hour * 60 + small_diff.tm_min)).zfill(2) + ":" + \
+                str(small_diff.tm_sec).zfill(2) + '\n'
 
             first_reading_csv.write(time_to_write)
 
