@@ -47,7 +47,7 @@ def migration(conn, conversations_file, conversation_hashmap):
         
         how_many_in_batch += add_data_to_references_batch(conversations_dict, batch_references, conversation_hashmap, conversation_hashmap_length)
 
-        if(how_many_in_batch == BATCH_SIZE):
+        if(how_many_in_batch > BATCH_SIZE):
             send_references_batch(cursor, batch_references)
             conn.commit()
             batch_references = []
